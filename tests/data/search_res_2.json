@@ -1,0 +1,3 @@
+{"qid": 1, "query": "some query", "positive_doc_id": "D1", "hits": ["D3", "D2", "D1"]}
+{"qid": 2, "query": "some query 1", "positive_doc_id": "D3", "hits": ["D1", "D3", "D6"]}
+{"qid": 3, "query": "some query 2", "positive_doc_id": "D4", "hits": ["D3", "D1", "D2"]}
