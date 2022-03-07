@@ -1,19 +1,19 @@
 from pathlib import Path
 from typing import Optional, Union
-from transformers import AutoModel, Trainer, TrainingArguments
+from transformers import Trainer, TrainingArguments
 from datasets import Dataset, load_from_disk
+from ..models.triplet_bert import TripletBert
 
 
 class TrainingArgs:
     def __init__(
             self,
-            output_dir,
             num_epochs: int = 1,
             batch_size: int = 8,
             accumulation_steps: int = 1,
             lr: float = 1e-5,
             logging_steps: int = 500,
-            save_strategy: str = 'epochs',
+            save_strategy: str = 'epoch',
 
     ):
         self.num_epochs = num_epochs
@@ -23,14 +23,18 @@ class TrainingArgs:
 
         self.logging_steps = logging_steps
         self.save_strategy = save_strategy
-        self.output_dir = output_dir
 
 
 class CustomModelTrainer:
-    def __init__(self, model_name_or_path: str, checkpoint_dir: Optional[str] = None, **kwargs):
+    def __init__(self,
+                 model_name_or_path: str,
+                 checkpoint_dir: Optional[str] = None,
+                 resume_training: bool = False,
+                 **kwargs):
         self.training_args = TrainingArgs(**kwargs)
         self.model_name_or_path = model_name_or_path
         self.checkpoint_dir = checkpoint_dir
+        self.resume_training = resume_training
 
     @staticmethod
     def _load_data(dataset_dir: Union[Path, str]) -> Dataset:
@@ -39,7 +43,8 @@ class CustomModelTrainer:
 
     def train_model(self, dataset_dir: Union[Path, str]):
         dataset = self._load_data(dataset_dir)
-        model = AutoModel.from_pretrained(self.model_name_or_path)
+        print(dataset)
+        model = TripletBert(self.model_name_or_path)
         train_args = TrainingArguments(
             lr_scheduler_type='constant',
             evaluation_strategy='no',
@@ -59,5 +64,5 @@ class CustomModelTrainer:
             train_dataset=dataset['train']
         )
         trainer.train(
-            resume_from_checkpoint=self.checkpoint_dir
+            resume_from_checkpoint=self.resume_training
         )
