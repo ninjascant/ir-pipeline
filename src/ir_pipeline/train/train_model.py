@@ -3,6 +3,9 @@ from typing import Optional, Union
 from transformers import Trainer, TrainingArguments
 from datasets import Dataset, load_from_disk
 from ..models.triplet_bert import TripletBert
+from ..utils.train_utils import seed_everything
+
+seed_everything()
 
 
 class TrainingArgs:
@@ -39,6 +42,7 @@ class CustomModelTrainer:
     @staticmethod
     def _load_data(dataset_dir: Union[Path, str]) -> Dataset:
         dataset = load_from_disk(dataset_dir)
+        dataset.set_format(type='torch')
         return dataset
 
     def train_model(self, dataset_dir: Union[Path, str]):
@@ -50,6 +54,7 @@ class CustomModelTrainer:
             evaluation_strategy='no',
             warmup_steps=500,
             weight_decay=0.01,
+            fp16=True,
             num_train_epochs=self.training_args.num_epochs,
             per_device_train_batch_size=self.training_args.batch_size,
             gradient_accumulation_steps=self.training_args.accumulation_steps,
