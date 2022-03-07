@@ -47,7 +47,6 @@ class CustomModelTrainer:
 
     def train_model(self, dataset_dir: Union[Path, str]):
         dataset = self._load_data(dataset_dir)
-        print(dataset)
         model = TripletBert(self.model_name_or_path)
         train_args = TrainingArguments(
             lr_scheduler_type='constant',

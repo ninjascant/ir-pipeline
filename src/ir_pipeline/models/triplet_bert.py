@@ -26,12 +26,16 @@ class TripletBert(nn.Module):
 
     def forward(
             self,
-            **kwargs
+            pos_ctx_input_ids,
+            neg_ctx_input_ids,
+            pos_ctx_attention_mask,
+            neg_ctx_attention_mask,
+            query_input_ids,
+            query_attention_mask,
     ) -> torch.Tensor:
-        print(**kwargs.keys())
         query_embed = self.get_embed(query_input_ids, query_attention_mask)
-        pos_ctx_embed = self.get_embed(pos_context_input_ids, pos_context_attention_mask)
-        neg_ctx_embed = self.get_embed(neg_context_input_ids, neg_context_attention_mask)
+        pos_ctx_embed = self.get_embed(pos_ctx_input_ids, pos_ctx_attention_mask)
+        neg_ctx_embed = self.get_embed(neg_ctx_input_ids, neg_ctx_attention_mask)
 
         loss = calculate_loss(query_embed, pos_ctx_embed, neg_ctx_embed)
         return loss,
