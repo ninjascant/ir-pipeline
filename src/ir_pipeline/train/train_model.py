@@ -45,15 +45,16 @@ class CustomModelTrainer:
         dataset.set_format(type='torch')
         return dataset
 
-    def train_model(self, dataset_dir: Union[Path, str]):
+    def train_model(self, dataset_dir: Union[Path, str], fp16: bool = False):
         dataset = self._load_data(dataset_dir)
-        model = TripletBert(self.model_name_or_path)
+        print(self.model_name_or_path)
+        model = TripletBert.from_pretrained('bert-base-uncased')
         train_args = TrainingArguments(
             lr_scheduler_type='constant',
             evaluation_strategy='no',
             warmup_steps=500,
             weight_decay=0.01,
-            fp16=True,
+            fp16=fp16,
             num_train_epochs=self.training_args.num_epochs,
             per_device_train_batch_size=self.training_args.batch_size,
             gradient_accumulation_steps=self.training_args.accumulation_steps,

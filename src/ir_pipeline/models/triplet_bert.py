@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModel
+from transformers import BertPreTrainedModel, BertModel
 
 
 def calculate_loss(query_embed, pos_ctx_embed, neg_ctx_embed):
@@ -9,16 +9,14 @@ def calculate_loss(query_embed, pos_ctx_embed, neg_ctx_embed):
     return loss
 
 
-class TripletBert(nn.Module):
-    def __init__(self, model_name_or_path: str):
-        super(TripletBert, self).__init__()
+class TripletBert(BertPreTrainedModel):
+    def __init__(self, config):
+        super().__init__(config)
 
-        self.transformer = AutoModel.from_pretrained(model_name_or_path)
-        self.linear = nn.Linear(312, 312)
-        self.ln = nn.LayerNorm(312)
+        self.bert = BertModel(config)
 
     def get_embed(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
-        outputs = self.transformer(input_ids, attention_mask=attention_mask)
+        outputs = self.bert(input_ids, attention_mask=attention_mask)
 
         last_hidden_state = outputs[0]
         out = torch.mean(last_hidden_state, 1)
